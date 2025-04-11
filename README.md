@@ -29,7 +29,7 @@ AUTO_SETUP_AUTOMATED=1 (Passer l'etape d'installation de DietPi)
 
 AUTO_SETUP_GLOBAL_PASSWORD=**** (Mot de passe root)
 
-AUTO_SETUP_INSTALL_SOFTWARE_ID=134 162 185 (Installation de docker compose, docker et portainer)
+AUTO_SETUP_INSTALL_SOFTWARE_ID=17 134 162 185 (Installation de git, docker compose, docker et portainer)
 
 SURVEY_OPTED_IN=0 (Désactivation de l'envoi de statistiques aux serveurs DietPi)
 ```
@@ -39,4 +39,39 @@ SURVEY_OPTED_IN=0 (Désactivation de l'envoi de statistiques aux serveurs DietPi
 ```
 aWIFI_SSID[0]='*****' (SSID Wifi)
 aWIFI_KEY[0]='*****' (Mot de passe Wifi)
+```
+
+## Installation de mowgli-docker
+
+```
+git clone https://github.com/cedbossneo/mowgli-docker.git
+cd mowgli-docker
+nano docker-compose.yaml
+```
+
+*Optionnel:* Commenter toutes les lignes ```ROSCONSOLE_CONFIG_FILE``` et ```ROSOUT_DISABLE_FILE_LOGGING``` (permet d'avoir plus de log d'erreurs)
+
+```
+docker compose up -d
+```
+
+## Installation du firmware
+
+### Sur votre PC
+```
+scp .pio/build/Yardforce500/firmware.bin root@192.168.1.80:/root/firmware.bin
+```
+
+### Sur le raspberry pi Mowgli
+Fichier yardforce500.cfg
+```
+source [find interface/stlink-v2.cfg]
+source [find target/stm32f1x.cfg]
+
+transport select hla_swd
+```
+
+```
+apt install openocd -y
+openocd -f yardforce500.cfg  -c " program "firmware.bin" 0x08000000 verify reset; shutdown;"
 ```
