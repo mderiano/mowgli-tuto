@@ -29,7 +29,7 @@ AUTO_SETUP_AUTOMATED=1 (Passer l'etape d'installation de DietPi)
 
 AUTO_SETUP_GLOBAL_PASSWORD=**** (Mot de passe root)
 
-AUTO_SETUP_INSTALL_SOFTWARE_ID=17 134 162 185 (Installation de git, docker compose, docker et portainer)
+AUTO_SETUP_INSTALL_SOFTWARE_ID=17 134 162 (Installation de git, docker compose, docker)
 
 SURVEY_OPTED_IN=0 (Désactivation de l'envoi de statistiques aux serveurs DietPi)
 ```
