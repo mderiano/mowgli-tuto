@@ -129,3 +129,18 @@ transport select hla_swd
 apt install openocd -y
 openocd -f yardforce500.cfg  -c " program "firmware.bin" 0x08000000 verify reset; shutdown;"
 ```
+
+## Utilisation en 4G
+
+### Sur freebox
+
+Dans les parametres avancés, serveur VPN créer un utilisateur mowgli.
+Puis dans wireguard crer un nouveau compte pour cet utilisateur.
+Ouvrir les ports 22 pour le SSH, 4005 et 4006 pour les interfaces web mowgli et openmower et les ports 9001 et 9002 pour le websocket openmower. 
+
+### Sur le raspberry pi Mowgli
+
+Copier le fichier de conf wireguard dans /etc/wireguard
+
+Si l'ip est diférente entre le wifi et la 4G faire attention à bien modifier dans le fichier .env et dans les settings mowgli.
+Relancer les containers docker
