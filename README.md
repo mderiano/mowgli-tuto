@@ -244,3 +244,7 @@ A l'interieur du répertoire mowgli-docker executer les commandes suivantes pour
 docker compose stop
 docker compose up -d
 ```
+
+Vous pouvez maintenant vous connecter à l'interface openmower en utilisant l'adresse IP de votre Freebox (visible dans "Etat de la freebox" -> "Etat Internet", ligne Adresse IPv4) suivi du port 4005 ou 4006 pour afficher les 2 applis openmower.
+
+Exemple: http://88.170.135.***:4005
