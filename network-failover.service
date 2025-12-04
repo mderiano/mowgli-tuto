@@ -1,0 +1,13 @@
+[Unit]
+Description=Network Failover WiFi/4G
+After=network-online.target wg-quick@mowgli.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/network-failover.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
