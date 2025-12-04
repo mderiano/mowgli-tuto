@@ -213,7 +213,7 @@ Puis cliquer sur le bouton Paramètres de la freebox.
 Ensuite séléctionner l'onglet Mode avancé puis cliquer sur l'icone Serveur VPN
 ![FREEBOX page parametres](https://github.com/user-attachments/assets/329ad02b-d0f7-480c-b80f-529ed5e56d8a)
 
-Dans les onglets à droite séléctionner Utilisateurs et créer un utilisateur (mowgli par exemple)
+Dans les onglets à droite séléctionner Utilisateurs et créer un utilisateur (mowgli par exemple). Dans ce formulaire choisissez une ip fixe, celle ci vous sera utile pour ouvrir les ports reseaux plus tard, ainsi que dans la config mowgli.
 ![FREEBOX serveur VPN nouvel utilisateur](https://github.com/user-attachments/assets/6c32bb93-9ea7-4d36-bc93-b657b901ab61)
 
 Puis dans l'onglet wireguard cliquer sur "Activer" et télécharger le fichier de configuration sur la ligne de votre utilisateur
@@ -233,11 +233,7 @@ Puis ajouter une redirection pour chacun des ports suivant
 
 Copier le fichier de conf wireguard dans /etc/wireguard
 
-Modifier le fichier .env contenu dans le répertoire mowgli-docker afin d'y affecter l'adresse ip local de votre dongle 4G. Pour obtenir cette IP vous pouvez lancer la commande
-```
-ifconfig
-```
-et localisez la ligne ETH1 qui a été créé par la clé usb 4G.
+Modifier le fichier .env contenu dans le répertoire mowgli-docker afin d'y affecter l'adresse ip du vpn qui à été fixé plus haut (192.168.27.66 dans mes images exemple).
 
 A l'interieur du répertoire mowgli-docker executer les commandes suivantes pour redémarrer openmower
 ```
@@ -248,3 +244,57 @@ docker compose up -d
 Vous pouvez maintenant vous connecter à l'interface openmower en utilisant l'adresse IP de votre Freebox (visible dans "Etat de la freebox" -> "Etat Internet", ligne Adresse IPv4) suivi du port 4005 ou 4006 pour afficher les 2 applis openmower.
 
 Exemple: http://88.170.135.***:4005
+
+### Se connecter en priorité au wifi et utiliser la connexion 4G uniquement lorsqu'il n'y a plus de reseau wifi
+Sur le raspberry pi:
+
+Editier le fichier /etc/network/interfaces
+```
+nano /etc/network/interfaces
+```
+
+Ajouter ```metric 100``` en dessous des lignes #WIFI et ```metric 600``` en dessous des lignes #Ethernet
+Voici par exemple mon fichier:
+```
+# Location: /etc/network/interfaces
+# Please modify network settings via: dietpi-config
+# Or create your own drop-ins in: /etc/network/interfaces.d/
+
+# Drop-in configs
+source interfaces.d/*
+
+# Ethernet
+allow-hotplug eth1
+iface eth1 inet static
+address 192.168.8.101
+netmask 255.255.255.0
+gateway 192.168.8.1
+dns-nameservers 212.27.38.253 192.168.1.14
+metric 600
+
+# WiFi
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+address 192.168.1.80
+netmask 255.255.255.0
+gateway 192.168.1.254
+#dns-nameservers 212.27.38.253 192.168.1.14
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+metric 100
+```
+ATTENTION: ajouter uniquement les lignes metric 100 et metric 600 ne toucher pas au reste
+
+Récupérer le fichier network-failover.sh sur ce repositorie [https://github.com/mderiano/mowgli-tuto/blob/main/network-failover.sh](https://github.com/mderiano/mowgli-tuto/blob/main/network-failover.sh) et copier le sur votre raspeberry pi dans /usr/local/bin/network-failover.sh
+Récupérer le fichier network-failover.service sur ce repositorie [https://github.com/mderiano/mowgli-tuto/blob/main/network-failover.service](https://github.com/mderiano/mowgli-tuto/blob/main/network-failover.service) et copier le sur votre raspeberry pi dans /etc/systemd/system/network-failover.service
+
+Activer et démarrer:
+```
+systemctl daemon-reload
+systemctl enable network-failover
+systemctl start network-failover
+```
+
+Vous pouvez redémarrer votre raspberry-pi pour être sur
+```
+reboot
+```
